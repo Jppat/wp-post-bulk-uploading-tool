@@ -1,0 +1,11 @@
+.env
+.archive/
+misc/
+venv/
+panay-news/
+wdj/
+__pycache__
+categories.json
+users.json
+requirements.txt
+tempCodeRunnerFile.py
