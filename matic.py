@@ -41,6 +41,19 @@ def single(docx_files):
         print("*" * 5)
 
 
+def test(docx_files):
+    for file in docx_files:
+        temp = Article.convert_to_html(file)
+        html_articles_list = article_list(temp)
+        for html_article in html_articles_list:
+            current_article = Article(html_file=html_article)
+            current_post = Post(current_article.article)
+            current_post.show_details()
+            # current_post.upload_post()
+            print("*" * 5)
+            # break #uncomment for checking
+
+
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         print("Usage: python matic.py <path to directory> <article setup>")
@@ -51,3 +64,5 @@ if __name__ == "__main__":
             single(doxc_files)
         elif (sys.argv[2]) == "multiple":
             multiple(doxc_files)
+        elif (sys.argv[2]) == "test":
+            test(doxc_files)
