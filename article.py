@@ -95,6 +95,8 @@ class Post:
 
         post = self._create_post()
 
+        # print("post: ", post)
+
         # prepare POST request details/requirements
         url = os.environ.get("URL")
         token = generate_token(os.environ.get("USER"), os.environ.get("APP_PW"))
@@ -106,6 +108,17 @@ class Post:
 
         print("status", wp_request)
         print("message", wp_request.text)
+
+        # Print request and response headers
+        # print("\nRequest Headers:")
+        # print(wp_request.request.headers)
+
+        # print("\nResponse Headers:")
+        # print(wp_request.headers)
+
+        # Save the response as an HTML file
+        # with open("wp_response.html", "w", encoding="utf-8") as file:
+        #     file.write(wp_request.text)
 
     def show_details(self):
         attributes = vars(self)
@@ -182,5 +195,5 @@ class Article:
 # post1.upload_post()
 # post1.show_details()
 
-# extractAttribute(url="https://panaynews.net/wp-json/wp/v2", attribute="users")
+# extractAttribute(url="https://panaynews.net/wp-json/wp/v2", attribute="categories")
 # extractAttribute(url="https://watchmendailyjournal.com/wp-json/wp/v2")
