@@ -36,14 +36,18 @@ class Article:
 
         return headers
 
-    def get_ids(self, resource, name):
-        url = os.environ.get("URL") + f"/{resource}?slug={name}"
+    def get_ids(self, resource, value, param):
+        url = os.environ.get("URL") + f"/{resource}?{param}]={value}"
         request = requests.get(
             url, headers=self.create_auth_header(), timeout=120, verify=False
         )
         data = request.json()
         ids = [item["id"] for item in data]
         return ids
+
+    def get_author_id(self):
+        author_id = self.get_ids("users", self.authors[0], "search")
+        return author_id[0]
 
     # def get_ids(self, attribute):
     #     # author_ids = []
@@ -70,8 +74,11 @@ class Article:
         url = os.environ.get("URL")
         headers = self.create_auth_header()
         post = asdict(self)
+        post["author"] = self.get_ids("users", self.authors[0])
+        post["categories"] = []
+        for category in self.categories:
+            self.get_ids("categories", category)
 
-        post["author"] = self.get_ids("author")
         wp_request = requests.post(
             url + "/posts",
             headers=headers,
@@ -137,7 +144,8 @@ def test():
     html = convert_to_html("test/mai no reason.docx")
     article = create_article(html)
     # test_show_details(article)
-    print("categories: ", article.get_ids("categories", "sports"))
+    print("author id: ", article.get_author_id())
+    # print("categories: ", article.get_ids("categories", "sports"))
 
 
 test()
