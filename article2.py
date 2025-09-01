@@ -18,7 +18,7 @@ load_dotenv(dotenv_path="test/local/.env", override=True)
 @dataclass
 class Article:
     title: str
-    authors: str | list[str] = "Panay News"
+    authors: list[str] = field(default_factory=list)
     content: str = ""
     categories: list[str] = field(default_factory=list)
     status: str = "draft"
@@ -36,23 +36,34 @@ class Article:
 
         return headers
 
-    def get_authors_ids(self):
-        # author_ids = []
-        params = {"search": self.authors[0]}
-        auth = self.create_auth_header()
-        url = os.environ.get("URL")
-        response = requests.get(
-            url + "/users",
-            headers=auth,
-            params=params,
-            timeout=120,
-            verify=False,
+    def get_ids(self, resource, name):
+        url = os.environ.get("URL") + f"/{resource}?slug={name}"
+        request = requests.get(
+            url, headers=self.create_auth_header(), timeout=120, verify=False
         )
+        data = request.json()
+        ids = [item["id"] for item in data]
+        return ids
 
-        for author in response.json():
-            author_id = author.get("id")
+    # def get_ids(self, attribute):
+    #     # author_ids = []
+    #     attribute_names = getattr(self, attribute)
+    #     for name in attribute_names:
+    #         params = {"search": name}
+    #         auth = self.create_auth_header()
+    #         url = os.environ.get("URL")
+    #         response = requests.get(
+    #             url + "/users",
+    #             headers=auth,
+    #             params=params,
+    #             timeout=120,
+    #             verify=False,
+    #         )
 
-            return author_id
+    #     for author in response.json():
+    #         author_id = author.get("id")
+
+    #         return author_id
 
     def upload(self):
 
@@ -60,7 +71,7 @@ class Article:
         headers = self.create_auth_header()
         post = asdict(self)
 
-        post["author"] = self.get_authors_ids()
+        post["author"] = self.get_ids("author")
         wp_request = requests.post(
             url + "/posts",
             headers=headers,
@@ -126,7 +137,7 @@ def test():
     html = convert_to_html("test/mai no reason.docx")
     article = create_article(html)
     # test_show_details(article)
-    print(article.upload())
+    print("categories: ", article.get_ids("categories", "sports"))
 
 
-# test()
+test()
