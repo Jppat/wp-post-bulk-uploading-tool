@@ -66,8 +66,6 @@ class Article:
         else:
             post.pop("categories")
 
-        print(post)
-
         wp_request = requests.post(
             url + "/posts",
             headers=headers,
