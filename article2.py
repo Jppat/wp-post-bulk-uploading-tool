@@ -42,7 +42,7 @@ class Article:
         return request.json()
 
     def get_author_id(self, author_name):
-        author_id = self.get_ids("users", author_name, "search")
+        author_id = self.get_ids("users", author_name.split()[0], "search")
         return [item["id"] for item in author_id]
 
     def get_category_id(self, category_name):
@@ -56,7 +56,11 @@ class Article:
         url = os.environ.get("URL")
         headers = self.create_auth_header()
         post = asdict(self)
-        post["author"] = self.get_author_id(self.authors[0])[0]
+        author = self.get_author_id(self.authors[0])[0]
+        if author:
+            post["author"] = self.get_author_id(self.authors[0])[0]
+        else:
+            post["author"] = 1  # default to admin if author not found
 
         category_ids = [self.get_category_id(category) for category in self.categories]
         category_ids = list(filter(lambda id: id != None, category_ids))

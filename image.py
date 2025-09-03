@@ -124,8 +124,8 @@ def compress_image(filename):
         img.save(filename="test/test.jpg")
 
 
-# proc_images("./wdj/")
-proc_images("./panay-news/")
+proc_images("./wdj/")
+# proc_images("./panay-news/")
 # proc_images("./photos")
 
 # # for testing
