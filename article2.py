@@ -75,10 +75,10 @@ class Article:
             headers=headers,
             json=post,
             timeout=120,
-            verify=False,
+            # verify=False,
         )
 
-        return wp_request.text
+        return wp_request
 
 
 def convert_to_html(filepath, output=False):
