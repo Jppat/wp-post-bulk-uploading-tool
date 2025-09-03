@@ -37,47 +37,38 @@ class Article:
         return headers
 
     def get_ids(self, resource, value, param):
-        url = os.environ.get("URL") + f"/{resource}?{param}]={value}"
+        url = os.environ.get("URL") + f"/{resource}?_fields=id&{param}={value}"
         request = requests.get(
             url, headers=self.create_auth_header(), timeout=120, verify=False
         )
-        data = request.json()
-        ids = [item["id"] for item in data]
-        return ids
+        return request.json()
 
-    def get_author_id(self):
-        author_id = self.get_ids("users", self.authors[0], "search")
-        return author_id[0]
+    def get_author_id(self, author_name):
+        author_id = self.get_ids("users", author_name, "search")
+        return [item["id"] for item in author_id]
 
-    # def get_ids(self, attribute):
-    #     # author_ids = []
-    #     attribute_names = getattr(self, attribute)
-    #     for name in attribute_names:
-    #         params = {"search": name}
-    #         auth = self.create_auth_header()
-    #         url = os.environ.get("URL")
-    #         response = requests.get(
-    #             url + "/users",
-    #             headers=auth,
-    #             params=params,
-    #             timeout=120,
-    #             verify=False,
-    #         )
-
-    #     for author in response.json():
-    #         author_id = author.get("id")
-
-    #         return author_id
+    def get_category_id(self, category_name):
+        category_id = self.get_ids("categories", category_name, "slug")
+        if category_id:
+            return category_id[0]["id"]
+        return None
 
     def upload(self):
 
         url = os.environ.get("URL")
         headers = self.create_auth_header()
         post = asdict(self)
-        post["author"] = self.get_ids("users", self.authors[0])
-        post["categories"] = []
-        for category in self.categories:
-            self.get_ids("categories", category)
+        post["author"] = self.get_author_id(self.authors[0])[0]
+
+        category_ids = [self.get_category_id(category) for category in self.categories]
+        category_ids = list(filter(lambda id: id != None, category_ids))
+
+        if category_ids:
+            post["categories"] = category_ids
+        else:
+            post.pop("categories")
+
+        print(post)
 
         wp_request = requests.post(
             url + "/posts",
@@ -129,23 +120,3 @@ def create_article(html_file):
         content=string_content,
     )
     return article
-
-
-def test_show_details(article):
-    print(article.title)
-    print(article.author)
-    print("content: ", type(article.content))
-    print(article.status)
-    print(article.format)
-
-
-def test():
-    # This function is a placeholder for testing purposes
-    html = convert_to_html("test/mai no reason.docx")
-    article = create_article(html)
-    # test_show_details(article)
-    print("author id: ", article.get_author_id())
-    # print("categories: ", article.get_ids("categories", "sports"))
-
-
-test()

@@ -17,37 +17,55 @@ def article_list(html_file):
     return articles
 
 
-def multiple(docx_files):
+def show_details(article):
+    print("Title: ", article.title)
+    print("Authors: ", article.authors)
+    print("Categories: ", article.categories)
+    print("Status: ", article.status)
+
+
+def multiple(docx_files, categories):
     for file in docx_files:
         print("processing ", file)
         html = convert_to_html(file)
         html_articles_list = article_list(html)
         for html_article in html_articles_list:
             current_article = create_article(html_article)
-            print(current_article.title)
+            if categories:
+                current_article.categories = categories
+
             response = current_article.upload()
+            if response:
+                show_details(current_article)
             print(response)
 
 
-def single(docx_files):
+def single(docx_files, categories):
     for file in docx_files:
         print("processing ", file)
         html = convert_to_html(file)
         article = create_article(html)
-        # article.categories = [category]
+        if categories:
+            article.categories = categories
+
         response = article.upload()
+        if response:
+            show_details(article)
         print(response)
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Usage: python matic.py <path to directory> <article setup>")
+    default_setup = "single"
+    if len(sys.argv) < 2:
+        print("Usage: python matic.py <path to directory> [article setup]")
         print("For article setup:")
         print("Single - for one article per .docx file")
         print("Multiple - for multiple articles per .docx file")
-    elif len(sys.argv) == 3:
+    else:
         doxc_files = search_docx_files(sys.argv[1])
-        if (sys.argv[2]) == "single":
-            single(doxc_files)
-        elif (sys.argv[2]) == "multiple":
-            multiple(doxc_files)
+        setup = sys.argv[2] if len(sys.argv) > 2 else default_setup
+        categories = sys.argv[3:] if len(sys.argv) > 3 else None
+        if setup == "single":
+            single(doxc_files, categories)
+        elif setup == "multiple":
+            multiple(doxc_files, categories)
