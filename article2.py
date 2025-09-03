@@ -75,7 +75,6 @@ class Article:
             headers=headers,
             json=post,
             timeout=120,
-            # verify=False,
         )
 
         return wp_request
