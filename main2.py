@@ -37,7 +37,7 @@ def multiple(docx_files, categories):
             response = current_article.upload()
             if response:
                 show_details(current_article)
-            print(response.status_code, "/n")
+            print(response.status_code, "\n")
 
 
 def single(docx_files, categories):
@@ -51,7 +51,7 @@ def single(docx_files, categories):
         response = article.upload()
         if response:
             show_details(article)
-        print(response.status_code, "/n")
+        print(response.status_code, "\n")
 
 
 if __name__ == "__main__":
