@@ -38,9 +38,7 @@ class Article:
 
     def get_ids(self, resource, value, param):
         url = os.environ.get("URL") + f"/{resource}?_fields=id&{param}={value}"
-        request = requests.get(
-            url, headers=self.create_auth_header(), timeout=120, verify=False
-        )
+        request = requests.get(url, headers=self.create_auth_header(), timeout=120)
         return request.json()
 
     def get_author_id(self, author_name):
