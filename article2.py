@@ -12,7 +12,7 @@ BY = re.compile(
 )  # pattern searching for 'by' at the start of a string
 
 # load_dotenv()  # take environment variables from .env.
-load_dotenv(dotenv_path="test/local/.env", override=True)
+load_dotenv(dotenv_path=".env", override=True)
 
 
 @dataclass
