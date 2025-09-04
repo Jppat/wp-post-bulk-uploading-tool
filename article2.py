@@ -12,7 +12,7 @@ BY = re.compile(
 )  # pattern searching for 'by' at the start of a string
 
 # load_dotenv()  # take environment variables from .env.
-load_dotenv(dotenv_path=".env", override=True)
+load_dotenv(dotenv_path="test/local/.env", override=True)
 
 
 @dataclass
@@ -36,17 +36,23 @@ class Article:
 
         return headers
 
-    def get_ids(self, resource, value, param):
-        url = os.environ.get("URL") + f"/{resource}?_fields=id&{param}={value}"
-        request = requests.get(url, headers=self.create_auth_header(), timeout=120)
+    def get_ids(self, resource, params):
+        url = os.environ.get("URL") + f"/{resource}?_fields=id&{params}"
+        request = requests.get(
+            url, headers=self.create_auth_header(), timeout=120, verify=False
+        )
         return request.json()
 
     def get_author_id(self, author_name):
-        author_id = self.get_ids("users", author_name.split()[0], "search")
+        author_name = author_name.split()
+        params_list = [f"search={name}" for name in author_name]
+        params = "&".join(params_list)
+        author_id = self.get_ids("users", params)
         return [item["id"] for item in author_id]
 
     def get_category_id(self, category_name):
-        category_id = self.get_ids("categories", category_name, "slug")
+        params = f"slug={category_name}"
+        category_id = self.get_ids("categories", params)
         if category_id:
             return category_id[0]["id"]
         return None
@@ -56,9 +62,10 @@ class Article:
         url = os.environ.get("URL")
         headers = self.create_auth_header()
         post = asdict(self)
-        author = self.get_author_id(self.authors[0])[0]
-        if author:
-            post["author"] = self.get_author_id(self.authors[0])[0]
+
+        if self.authors:
+            author_id = self.get_author_id(self.authors[0])
+            post["author"] = author_id[0]
         else:
             post["author"] = 1  # default to admin if author not found
 
@@ -75,6 +82,7 @@ class Article:
             headers=headers,
             json=post,
             timeout=120,
+            verify=False,
         )
 
         return wp_request
