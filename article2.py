@@ -12,7 +12,8 @@ BY = re.compile(
 )  # pattern searching for 'by' at the start of a string
 
 # load_dotenv()  # take environment variables from .env.
-load_dotenv(dotenv_path="test/local/.env", override=True)
+# load_dotenv(dotenv_path="test/local/.env", override=True)
+load_dotenv(dotenv_path=".env", override=True)
 
 
 @dataclass
@@ -38,9 +39,7 @@ class Article:
 
     def get_ids(self, resource, params):
         url = os.environ.get("URL") + f"/{resource}?_fields=id&{params}"
-        request = requests.get(
-            url, headers=self.create_auth_header(), timeout=120, verify=False
-        )
+        request = requests.get(url, headers=self.create_auth_header(), timeout=120)
         return request.json()
 
     def get_author_id(self, author_name):
@@ -63,11 +62,14 @@ class Article:
         headers = self.create_auth_header()
         post = asdict(self)
 
-        if self.authors:
-            author_id = self.get_author_id(self.authors[0])
-            post["author"] = author_id[0]
-        else:
+        if not self.authors:
             post["author"] = 1  # default to admin if author not found
+        else:
+            author_id = self.get_author_id(self.authors[0])
+            if author_id:
+                post["author"] = author_id[0]
+            else:
+                post["author"] = 1  # default to admin if author not found
 
         category_ids = [self.get_category_id(category) for category in self.categories]
         category_ids = list(filter(lambda id: id != None, category_ids))
@@ -82,7 +84,7 @@ class Article:
             headers=headers,
             json=post,
             timeout=120,
-            verify=False,
+            # verify=False,
         )
 
         return wp_request
