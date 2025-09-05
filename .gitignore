@@ -9,5 +9,3 @@ test/
 *.env
 *.json
 *.txt
-test.py
-image.py
