@@ -1,7 +1,0 @@
-beautifulsoup4==4.11.2
-mammoth==1.9.0
-Pillow==11.2.1
-python-dotenv==1.1.0
-Requests==2.32.3
-Wand==0.6.13
-lxml==5.4.0
