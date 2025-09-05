@@ -10,3 +10,4 @@ test/
 *.json
 *.txt
 test.py
+image.py
